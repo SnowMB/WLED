@@ -7587,14 +7587,6 @@ static const char _data_FX_MODE_2DWAVINGCELL[] PROGMEM = "Waving Cell@!,,Amplitu
 #include <graph/GraphEdge.h>
 
 uint16_t mode_infcRndEdge(void) {
-  //struct PathData{
-  //  infc::GraphEdge edge;
-  //};
-
-  //if (!SEGENV.allocateData(sizeof(PathData))) return mode_static(); //allocation failed
-
-  //PathData * data = (PathData*) SEGENV.data;
-
   um_data_t * umData;
   if (!usermods.getUMData(&umData, USERMOD_ID_INFINITYCUBEZ)) return mode_static(); // not infinitycubez?
   
@@ -7613,33 +7605,54 @@ uint16_t mode_infcRndEdge(void) {
     {
       SEGMENT.setPixelColor(edge.ledAt(i), CRGB::Red);  
     }
-  }/*
-
-
-  if (!data->edge){
-    um_data_t * umData;
-    if (!usermods.getUMData(&umData, USERMOD_ID_INFINITYCUBEZ)) return mode_static(); // not infinitycubez?
-    auto graph = (infc::Graph*)umData->u_data[0];
-    if (graph->totalLeds() != SEGLEN) return mode_static();
-
-    data->edge = graph->randomEdge();
   }
-
-  uint32_t cycleTime = (255 - SEGMENT.speed);
-  cycleTime += FRAMETIME*2;
-  SEGENV.step = strip.now / cycleTime;
-
-  while (SEGENV.step >= data->edge.size())
-  {
-    SEGENV.step -= data->edge.size();
-    data->edge = data->edge.moveForwardRandom();
-  }
-
-  
-*/
   return FRAMETIME;
 } // mode_infcRndEdge
 static const char _data_FX_MODE_infcRndEdge[] PROGMEM = "InfinityCube Rnd Edge@!,!;!,!;!";
+
+uint16_t mode_infcComet(void) {
+  struct PathData{
+    infc::GraphEdge edge;
+    uint32_t start;
+  };
+
+  if (!SEGENV.allocateData(sizeof(PathData))) return mode_static(); //allocation failed
+
+  PathData * data = (PathData*) SEGENV.data;
+
+  if (!data->edge)
+  {
+    um_data_t * umData;
+    if (!usermods.getUMData(&umData, USERMOD_ID_INFINITYCUBEZ)) return mode_static(); // not infinitycubez?
+    
+    auto graph = (infc::Graph*)umData->u_data[0];
+    if (!graph || graph->totalLeds() != SEGLEN) return mode_static();
+
+    data->edge = graph->randomEdge();
+    data->start = strip.now;
+  }
+
+  uint32_t cycleTime = (255 - SEGMENT.speed);
+  cycleTime = std::max(cycleTime, (uint32_t)FRAMETIME*2); //minimum 2 frames!
+  uint32_t it = (strip.now - data->start) / cycleTime;
+  if (SEGENV.step != it)
+  {
+    while (it > data->edge.size())
+    {
+      it -= data->edge.size();
+      data->edge = data->edge.moveForwardRandom();
+      data->start = strip.now;
+    }
+
+    SEGMENT.fill(CRGB::Black);
+    
+    SEGMENT.setPixelColor(data->edge.ledAt(it), CRGB::Red);  
+    SEGENV.step = it;
+    
+  }
+  return FRAMETIME;
+} // mode_infcComet
+static const char _data_FX_MODE_infcComet[] PROGMEM = "InfinityCube Comet@!,!;!,!;!";
 
 #endif
 
@@ -7883,5 +7896,6 @@ void WS2812FX::setupEffectData() {
 
 #if defined(USERMOD_INFINITYCUBEZ)
   addEffect(FX_MODE_INFC_RNDEDGE, &mode_infcRndEdge, _data_FX_MODE_infcRndEdge); // infc
+  addEffect(FX_MODE_INFC_COMET, &mode_infcComet, _data_FX_MODE_infcComet); // infc
 #endif
 }

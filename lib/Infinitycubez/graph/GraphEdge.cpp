@@ -39,11 +39,8 @@ namespace infc
 
     auto rnd = std::rand() % possibilities;
 
-    if (avoidSameEdge)
-    {
-      return _graph->getNthEdgeOfNodeButIgnoreEdge(node.id(), rnd, _id);  
-    }
+    auto edge = avoidSameEdge? _graph->getNthEdgeOfNodeButIgnoreEdge(node.id(), rnd, _id) : _graph->getNthEdgeOfNode(node.id(), rnd);
 
-    return _graph->getNthEdgeOfNode(node.id(), rnd);
+    return edge;
   }
 }

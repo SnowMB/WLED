@@ -94,7 +94,7 @@ namespace infc
       }
       if (_definition[i].backNode == node && n-- == 0)
       {
-        return {*this, _definition[i], i, false};
+        return {*this, _definition[i], i, true};
       }
     }
 

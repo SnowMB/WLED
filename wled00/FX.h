@@ -321,8 +321,9 @@
 #define FX_MODE_2DAKEMI                186
 
 #define FX_MODE_INFC_RNDEDGE           187
+#define FX_MODE_INFC_COMET             188
 
-#define MODE_COUNT                     188
+#define MODE_COUNT                     189
 
 typedef enum mapping1D2D {
   M12_Pixels = 0,
