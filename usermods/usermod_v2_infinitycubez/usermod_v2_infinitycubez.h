@@ -15,11 +15,20 @@ private:
   } config;
 
   infc::Graph _graph;
+  um_data_t _data;
 
   // string that are used multiple time (this will save some flash memory)
   static const char _name[];
 
 public:
+  InfinityCubezUsermod()
+  {
+    _data.u_size = 0;
+    _data.u_type = new um_types_t[1];
+    _data.u_data = new void *[1];
+    _data.u_data[0] = &_graph;
+  }
+
   /*
    * setup() is called once at boot. WiFi is not yet connected at this point.
    * readFromConfig() is called prior to setup()
@@ -27,12 +36,19 @@ public:
    */
   void setup()
   {
-    
   }
 
-  void loop() {
-
+  void loop()
+  {
   }
+
+  bool getUMData(um_data_t **data)
+  {
+    if (!data)
+      return false;
+    *data = &_data;
+    return true;
+  }; // usermod data exchange [see examples for audio effects]
 
   /*
    * addToConfig() can be used to add custom persistent settings to the cfg.json file in the "um" (usermod) object.
@@ -101,7 +117,7 @@ public:
 
     configComplete &= getJsonValue(top["ledsPerEdge"], config.ledsPerEdge, 25);
 
-    if (strip.getLength() <= 30*config.ledsPerEdge)
+    if (strip.getLength() <= 30 * config.ledsPerEdge)
     {
       _graph.setDefinition(infc::makeInfinityCubeD12(config.ledsPerEdge));
     }

@@ -6,12 +6,12 @@ namespace infc
 {
 
 class Graph;
-class GraphNode;
+class GraphEdge;
 
 class GraphNode
 {
 public:
-  inline GraphEdge() = default;
+  inline GraphNode() = default;
   inline GraphNode(Graph const&g, int id) : _graph{&g}, _id{id} {}
 
   inline int id() const { return _id; }
