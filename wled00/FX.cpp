@@ -7600,15 +7600,20 @@ uint16_t mode_infcRndEdge(void) {
   {
     SEGENV.step = it;
     SEGMENT.fill(CRGB::Black);
+    
     auto edge = graph->randomEdge();
+    SEGMENT.aux0 = ++SEGMENT.aux0 % 256;
+    
     for (int i = 0; i<edge.size(); i++)
     {
-      SEGMENT.setPixelColor(edge.ledAt(i), CRGB::Red);  
+      SEGMENT.setPixelColor(edge.ledAt(i), SEGMENT.color_from_palette(SEGMENT.aux0, false, PALETTE_SOLID_WRAP, 255));  
     }
+
+    return FRAMETIME;
   }
   return FRAMETIME;
 } // mode_infcRndEdge
-static const char _data_FX_MODE_infcRndEdge[] PROGMEM = "InfinityCube Rnd Edge@!,!;!,!;!";
+static const char _data_FX_MODE_infcRndEdge[] PROGMEM = "InfinityCube Rnd Edge@!;!,!;!";
 
 uint16_t mode_infcComet(void) {
   struct PathData{
@@ -7646,7 +7651,7 @@ uint16_t mode_infcComet(void) {
 
     SEGMENT.fill(CRGB::Black);
     
-    SEGMENT.setPixelColor(data->edge.ledAt(it), CRGB::Red);  
+    SEGMENT.setPixelColor(data->edge.ledAt(it), SEGCOLOR(0));  
     SEGENV.step = it;
     
   }
